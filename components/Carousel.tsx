@@ -27,7 +27,7 @@ interface CarouselProps {
   gap?: number
 }
 
-const Carousel: React.FC<CarouselProps> = ({ items, itemWidth = 358, gap = 24 }) => {
+const Carousel: React.FC<CarouselProps> = ({ items, itemWidth = 358, gap = 32 }) => {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
   const cardsToShow = 3
@@ -55,14 +55,18 @@ const Carousel: React.FC<CarouselProps> = ({ items, itemWidth = 358, gap = 24 })
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative"
-      style={{ width: containerWidth, margin: '0 auto' }}
+      className="relative mx-auto"
+      style={{ 
+        width: containerWidth + 160, // Add extra space for navigation buttons
+        maxWidth: '100vw',
+        padding: '0 80px' // Add padding for the navigation buttons
+      }}
     >
       {/* Navigation Buttons */}
       {currentIndex > 0 && (
         <button
           onClick={() => scroll('left')}
-          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-16 z-10 w-10 h-10 rounded-full bg-slate-800/80 text-white flex items-center justify-center hover:bg-slate-700/80 transition-colors backdrop-blur-sm border border-slate-700/50"
+          className="absolute left-16 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-slate-800/80 text-white flex items-center justify-center hover:bg-slate-700/80 transition-colors backdrop-blur-sm border border-slate-700/50"
         >
           <ChevronLeft className="w-6 h-6" />
         </button>
@@ -70,7 +74,7 @@ const Carousel: React.FC<CarouselProps> = ({ items, itemWidth = 358, gap = 24 })
       {currentIndex < items.length - cardsToShow && (
         <button
           onClick={() => scroll('right')}
-          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-16 z-10 w-10 h-10 rounded-full bg-slate-800/80 text-white flex items-center justify-center hover:bg-slate-700/80 transition-colors backdrop-blur-sm border border-slate-700/50"
+          className="absolute right-16 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-slate-800/80 text-white flex items-center justify-center hover:bg-slate-700/80 transition-colors backdrop-blur-sm border border-slate-700/50"
         >
           <ChevronRight className="w-6 h-6" />
         </button>

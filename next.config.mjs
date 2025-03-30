@@ -15,11 +15,24 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
   },
   experimental: {
     webpackBuildWorker: true,
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
+  },
+  output: 'standalone',
+  reactStrictMode: true,
+  swcMinify: true,
+  webpack: (config) => {
+    config.resolve.fallback = { fs: false, net: false, tls: false };
+    return config;
   },
 }
 
