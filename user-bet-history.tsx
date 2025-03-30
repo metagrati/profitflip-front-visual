@@ -20,11 +20,10 @@ interface UserBetHistoryProps {
   onClaimRewards?: (epochs: number[]) => Promise<void>
 }
 
-const UserBetHistory: React.FC<UserBetHistoryProps> = ({ bets, loading = false, onClaimRewards }) => {
-  // Calculate unclaimed wins
-  const unclaimedWins = useMemo(() => {
-    return bets.filter((bet) => bet.result === "Win" && !bet.claimed)
-  }, [bets])
+export const UserBetHistory: React.FC<UserBetHistoryProps> = ({ bets, loading = false, onClaimRewards }) => {
+  // Sort bets by epoch number in descending order (most recent first)
+  const sortedBets = [...bets].sort((a, b) => b.epoch - a.epoch)
+  const unclaimedWins = sortedBets.filter(bet => bet.result === "Win" && !bet.claimed)
 
   const handleClaimAll = async () => {
     if (onClaimRewards && unclaimedWins.length > 0) {
@@ -83,44 +82,66 @@ const UserBetHistory: React.FC<UserBetHistoryProps> = ({ bets, loading = false, 
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-8 bg-[#1a2b4b]/80 backdrop-blur-sm rounded-3xl shadow-2xl max-w-3xl mx-auto border border-[rgba(255,255,255,0.1)]"
+      className="relative p-5 bg-slate-900/40 backdrop-blur-md rounded-3xl shadow-2xl max-w-3xl mx-auto border border-white/5 mt-16 overflow-hidden"
     >
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-yellow-300 bg-clip-text text-transparent">
-          Your Bet History
-        </h3>
-
-        {unclaimedWins.length > 0 && (
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleClaimAll}
-            className="flex items-center gap-1.5 px-5 py-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-full hover:from-orange-600 hover:to-amber-600 transition-all duration-300 shadow-md"
-          >
-            <Award className="w-4 h-4" />
-            Claim {unclaimedWins.length > 1 ? `(${unclaimedWins.length})` : ""}
-          </motion.button>
-        )}
+      {/* Background gradient effects */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-48 h-48 bg-orange-500/5 rounded-full blur-[100px]" />
+        <div className="absolute bottom-0 right-1/4 w-48 h-48 bg-blue-500/5 rounded-full blur-[100px]" />
       </div>
 
-      <motion.div
-        className="space-y-4"
-        variants={{
-          hidden: { opacity: 0 },
-          show: {
-            opacity: 1,
-            transition: {
-              staggerChildren: 0.1,
+      <div className="relative">
+        <div className="flex justify-between items-center mb-4">
+          <motion.h3
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-base font-medium bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent"
+          >
+            Your Bet History
+          </motion.h3>
+
+          {unclaimedWins.length > 0 && (
+            <motion.button
+              whileHover={{ scale: 1.02, y: -1 }}
+              whileTap={{ scale: 0.98 }}
+              className="relative group"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl blur-md opacity-50 group-hover:opacity-75 transition-opacity" />
+              <div
+                onClick={handleClaimAll}
+                className="relative flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-xs font-medium rounded-xl transition-all shadow-lg border border-orange-400/20 backdrop-blur-sm"
+              >
+                <Award className="w-3.5 h-3.5" />
+                Claim {unclaimedWins.length > 1 ? `(${unclaimedWins.length})` : ""}
+              </div>
+            </motion.button>
+          )}
+        </div>
+
+        <motion.div
+          className="space-y-2"
+          variants={{
+            hidden: { opacity: 0 },
+            show: {
+              opacity: 1,
+              transition: {
+                staggerChildren: 0.05,
+              },
             },
-          },
-        }}
-        initial="hidden"
-        animate="show"
-      >
-        {bets.map((bet, index) => (
-          <BetHistoryItem key={bet.epoch} bet={bet} index={index} />
-        ))}
-      </motion.div>
+          }}
+          initial="hidden"
+          animate="show"
+        >
+          {sortedBets.map((bet, index) => (
+            <BetHistoryItem 
+              key={bet.epoch} 
+              bet={bet} 
+              index={index}
+              totalBets={sortedBets.length}
+            />
+          ))}
+        </motion.div>
+      </div>
     </motion.div>
   )
 }
@@ -128,97 +149,89 @@ const UserBetHistory: React.FC<UserBetHistoryProps> = ({ bets, loading = false, 
 const BetHistoryItem: React.FC<{
   bet: UserBet
   index: number
-}> = ({ bet, index }) => {
+  totalBets: number
+}> = ({ bet, index, totalBets }) => {
   const resultColors = {
-    Win: "bg-[rgba(16,185,129,0.1)] border-[rgba(16,185,129,0.2)] text-green-300",
-    Lose: "bg-[rgba(239,68,68,0.1)] border-[rgba(239,68,68,0.2)] text-red-300",
-    Pending: "bg-[rgba(245,158,11,0.1)] border-[rgba(245,158,11,0.2)] text-amber-300",
+    Win: "border-green-400/10 bg-green-500/5 hover:bg-green-500/10 hover:border-green-400/20",
+    Lose: "border-red-400/10 bg-red-500/5 hover:bg-red-500/10 hover:border-red-400/20",
+    Pending: "border-orange-400/10 bg-orange-500/5 hover:bg-orange-500/10 hover:border-orange-400/20",
   }
+
+  // A bet is live only if it's the most recent (highest epoch number)
+  const isLive = index === 0 && bet.result === "Pending"
+  const displayResult = isLive ? "Pending" : bet.result
 
   return (
     <motion.div
       variants={{
-        hidden: { opacity: 0, y: 20 },
-        show: { opacity: 1, y: 0 },
+        hidden: { opacity: 0, y: 5 },
+        show: { opacity: 1, y: 0 }
       }}
-      whileHover={{ scale: 1.01 }}
       className={cn(
-        "p-5 rounded-2xl border backdrop-blur-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4",
-        "transition-all duration-300 hover:shadow-md",
-        resultColors[bet.result],
+        "py-2.5 px-4 rounded-2xl border backdrop-blur-sm flex items-center justify-between gap-3",
+        "transition-all duration-200",
+        resultColors[displayResult],
       )}
     >
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <div
           className={cn(
-            "flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center",
-            "bg-[rgba(255,255,255,0.05)] shadow-md border-2",
-            bet.position === "Bull" ? "border-green-500" : "border-orange-500",
+            "flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center",
+            "bg-slate-900/50 shadow-sm backdrop-blur-sm border",
+            bet.position === "Bull" 
+              ? "border-green-400/20 bg-green-500/5" 
+              : "border-red-400/20 bg-red-500/5",
           )}
         >
           {bet.position === "Bull" ? (
-            <ArrowUp className={cn("w-6 h-6 text-green-500")} />
+            <ArrowUp className="w-4 h-4 text-green-400" />
           ) : (
-            <ArrowDown className={cn("w-6 h-6 text-orange-500")} />
+            <ArrowDown className="w-4 h-4 text-red-400" />
           )}
         </div>
-        <div>
-          <div className="font-bold text-lg text-white">Round #{bet.epoch}</div>
-          <div className="text-sm text-gray-300 flex items-center gap-1">
-            <Wallet className="w-3.5 h-3.5" /> {bet.amount} POL
+        <div className="flex gap-3 items-center">
+          <div className="font-medium text-sm text-white/90">#{bet.epoch}</div>
+          <div className="text-xs text-gray-400/90 flex items-center gap-1.5 bg-white/5 px-2 py-1 rounded-lg backdrop-blur-sm">
+            <Wallet className="w-3.5 h-3.5" /> {bet.amount}
           </div>
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          className={cn(
-            "px-4 py-1.5 rounded-full text-sm font-medium",
-            "shadow-md backdrop-blur-sm",
-            bet.result === "Win"
-              ? "bg-green-500/20 text-green-300 border border-green-500/30"
-              : bet.result === "Lose"
-                ? "bg-red-500/20 text-red-300 border border-red-500/30"
-                : "bg-amber-500/20 text-amber-300 border border-amber-500/30",
-          )}
-        >
-          {bet.result === "Pending" ? (
+      <div className="flex items-center gap-2">
+        <div className={cn(
+          "px-3 py-1 rounded-xl text-xs font-medium",
+          "shadow-sm backdrop-blur-sm border",
+          displayResult === "Win"
+            ? "border-green-400/20 text-green-400 bg-green-500/5"
+            : displayResult === "Lose"
+              ? "border-red-400/20 text-red-400 bg-red-500/5"
+              : "border-orange-400/20 text-orange-400 bg-orange-500/5",
+        )}>
+          {displayResult === "Pending" ? (
             <span className="flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5" /> Pending
+              <span className="flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-1.5 w-1.5 rounded-full bg-orange-200 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-orange-400"></span>
+              </span>
+              Live
             </span>
           ) : (
-            bet.result
+            displayResult
           )}
-        </motion.div>
+        </div>
 
-        {bet.result === "Win" && (
-          <div className="flex items-center gap-1 text-sm">
+        {displayResult === "Win" && (
+          <div className="text-[10px] font-medium">
             {bet.claimed ? (
-              <motion.span
-                whileHover={{ scale: 1.05 }}
-                className="flex items-center gap-1.5 text-green-300 bg-green-500/10 px-3 py-1.5 rounded-full border border-green-500/20"
-              >
-                <CheckCircle className="w-4 h-4" /> Claimed
-              </motion.span>
+              <span className="flex items-center gap-1 px-2 py-1 rounded-lg bg-green-500/5 border border-green-400/20 text-green-400/90 backdrop-blur-sm">
+                <CheckCircle className="w-3 h-3" /> Claimed
+              </span>
             ) : (
-              <motion.span
-                whileHover={{ scale: 1.05 }}
-                className="flex items-center gap-1.5 text-amber-300 bg-amber-500/10 px-3 py-1.5 rounded-full border border-amber-500/20"
-              >
-                <Award className="w-4 h-4" /> Unclaimed
-              </motion.span>
+              <span className="flex items-center gap-1 px-2 py-1 rounded-lg bg-amber-500/5 border border-amber-400/20 text-amber-400/90 backdrop-blur-sm">
+                <Award className="w-3 h-3" /> Unclaimed
+              </span>
             )}
           </div>
-        )}
-
-        {bet.result === "Lose" && (
-          <motion.span
-            whileHover={{ scale: 1.05 }}
-            className="flex items-center gap-1.5 text-sm text-red-300 bg-red-500/10 px-3 py-1.5 rounded-full border border-red-500/20"
-          >
-            <XCircle className="w-4 h-4" /> No Reward
-          </motion.span>
         )}
       </div>
     </motion.div>
