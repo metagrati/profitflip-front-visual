@@ -76,7 +76,7 @@ export const PredictionCard: React.FC<PredictionCardProps> = ({
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -5 }}
       transition={{ duration: 0.4 }}
-      className="w-[358px] h-[520px] relative perspective-1000 mx-4"
+      className="w-[358px] h-[520px] relative perspective-1000 mx-6 my-8"
     >
       <motion.div
         className={cn(
@@ -98,7 +98,7 @@ export const PredictionCard: React.FC<PredictionCardProps> = ({
             "flex flex-col rounded-3xl p-5",
             "bg-gradient-to-br from-slate-900/80 via-slate-800/70 to-slate-900/80",
             "border border-white/10",
-            "shadow-2xl backdrop-blur-md",
+            "shadow-[0_8px_16px_rgba(0,0,0,0.2)] backdrop-blur-md",
             "overflow-hidden",
             isLive && "ring-1 ring-orange-500/30"
           )}
@@ -155,12 +155,12 @@ export const PredictionCard: React.FC<PredictionCardProps> = ({
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10"
+              className="absolute -top-2.5 left-1/2 transform -translate-x-1/2 z-10"
             >
               <motion.div 
                 animate={{ 
-                  scale: [1, 1.02, 1],
-                  opacity: [1, 0.95, 1]
+                  scale: [1, 1.01, 1],
+                  opacity: [1, 0.98, 1]
                 }}
                 transition={{ 
                   duration: 2,
@@ -169,11 +169,11 @@ export const PredictionCard: React.FC<PredictionCardProps> = ({
                 }}
                 className="relative"
               >
-                <div className="relative px-4 py-1 bg-orange-500 text-white rounded-full text-xs font-medium shadow-lg">
-                  <span className="relative flex items-center gap-1.5">
-                    <span className="flex h-1.5 w-1.5">
-                      <span className="animate-ping absolute inline-flex h-1.5 w-1.5 rounded-full bg-white opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
+                <div className="relative px-8 py-[2px] w-[90px] bg-[#FF7A00] text-white rounded-full text-[11px] font-medium tracking-wider shadow-sm text-center">
+                  <span className="relative flex items-center justify-center gap-[7px]">
+                    <span className="flex h-1 w-1">
+                      <span className="animate-ping absolute inline-flex h-1 w-1 rounded-full bg-white opacity-60"></span>
+                      <span className="relative inline-flex rounded-full h-1 w-1 bg-white"></span>
                     </span>
                     LIVE
                   </span>
