@@ -76,7 +76,7 @@ export const PredictionCard: React.FC<PredictionCardProps> = ({
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -5 }}
       transition={{ duration: 0.4 }}
-      className="w-[358px] h-[520px] relative perspective-1000 mx-6 my-8"
+      className="w-[358px] min-h-[520px] relative perspective-1000 mx-auto"
     >
       <motion.div
         className={cn(
@@ -86,6 +86,7 @@ export const PredictionCard: React.FC<PredictionCardProps> = ({
         )}
         style={{
           transformStyle: "preserve-3d",
+          minHeight: "520px"
         }}
       >
         {/* Front of card */}
@@ -99,11 +100,12 @@ export const PredictionCard: React.FC<PredictionCardProps> = ({
             "bg-gradient-to-br from-slate-900/80 via-slate-800/70 to-slate-900/80",
             "border border-white/10",
             "shadow-[0_8px_16px_rgba(0,0,0,0.2)] backdrop-blur-md",
-            "overflow-hidden",
+            "overflow-visible",
             isLive && "ring-1 ring-orange-500/30"
           )}
           style={{
             backfaceVisibility: "hidden",
+            minHeight: "520px"
           }}
         >
           {/* Background chart */}

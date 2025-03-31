@@ -57,16 +57,15 @@ const Carousel: React.FC<CarouselProps> = ({ items, itemWidth = 358, gap = 32 })
       animate={{ opacity: 1, y: 0 }}
       className="relative mx-auto"
       style={{ 
-        width: containerWidth + 160, // Add extra space for navigation buttons
+        width: `min(${containerWidth}px, 100vw)`,
         maxWidth: '100vw',
-        padding: '0 80px' // Add padding for the navigation buttons
       }}
     >
       {/* Navigation Buttons */}
       {currentIndex > 0 && (
         <button
           onClick={() => scroll('left')}
-          className="absolute left-16 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-slate-800/80 text-white flex items-center justify-center hover:bg-slate-700/80 transition-colors backdrop-blur-sm border border-slate-700/50"
+          className="absolute -left-12 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-slate-800/80 text-white flex items-center justify-center hover:bg-slate-700/80 transition-colors backdrop-blur-sm border border-slate-700/50"
         >
           <ChevronLeft className="w-6 h-6" />
         </button>
@@ -74,7 +73,7 @@ const Carousel: React.FC<CarouselProps> = ({ items, itemWidth = 358, gap = 32 })
       {currentIndex < items.length - cardsToShow && (
         <button
           onClick={() => scroll('right')}
-          className="absolute right-16 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-slate-800/80 text-white flex items-center justify-center hover:bg-slate-700/80 transition-colors backdrop-blur-sm border border-slate-700/50"
+          className="absolute -right-12 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-slate-800/80 text-white flex items-center justify-center hover:bg-slate-700/80 transition-colors backdrop-blur-sm border border-slate-700/50"
         >
           <ChevronRight className="w-6 h-6" />
         </button>
@@ -82,6 +81,7 @@ const Carousel: React.FC<CarouselProps> = ({ items, itemWidth = 358, gap = 32 })
 
       {/* Carousel Container */}
       <div 
+        ref={scrollRef}
         className="overflow-hidden py-8"
       >
         <motion.div 
@@ -89,7 +89,10 @@ const Carousel: React.FC<CarouselProps> = ({ items, itemWidth = 358, gap = 32 })
           style={{ 
             gap,
             transform: `translateX(-${currentIndex * (itemWidth + gap)}px)`,
-            transition: 'transform 0.5s ease-out',
+            transition: 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+            scrollSnapType: 'x mandatory',
+            scrollBehavior: 'smooth',
+            width: `${items.length * (itemWidth + gap)}px`
           }}
         >
           {items.map((item, index) => (
@@ -98,6 +101,7 @@ const Carousel: React.FC<CarouselProps> = ({ items, itemWidth = 358, gap = 32 })
               style={{ 
                 width: itemWidth,
                 flexShrink: 0,
+                scrollSnapAlign: 'start',
               }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
